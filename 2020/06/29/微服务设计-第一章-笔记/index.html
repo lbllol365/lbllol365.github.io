@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"8.0.0-rc.3","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="第一章 微服务什么是微服务很小，专注于做好一件事单一职责原则：把因相同原因而变化的东西聚合到一起，而把因不同原因而变化的东西分离开来。 怎样确定代码库足够小？  如果你不再感觉你的代码库过大，可能它就足够小了。  代码库的大小要与团队的大小相匹配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微服务设计 第一章 笔记">
+<meta property="og:url" content="http://yoursite.com/2020/06/29/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1-%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="子夕听雨的博客">
+<meta property="og:description" content="第一章 微服务什么是微服务很小，专注于做好一件事单一职责原则：把因相同原因而变化的东西聚合到一起，而把因不同原因而变化的东西分离开来。 怎样确定代码库足够小？  如果你不再感觉你的代码库过大，可能它就足够小了。  代码库的大小要与团队的大小相匹配">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/06/29/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1-%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%AC%94%E8%AE%B0/1.png">
+<meta property="article:published_time" content="2020-06-29T10:17:31.000Z">
+<meta property="article:modified_time" content="2020-06-29T10:21:53.792Z">
+<meta property="article:author" content="子夕听雨">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/29/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1-%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%AC%94%E8%AE%B0/1.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/29/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1-%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>微服务设计 第一章 笔记 | 子夕听雨的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">子夕听雨的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/29/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1-%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="子夕听雨">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="子夕听雨的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          微服务设计 第一章 笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-06-29 18:17:31 / Modified: 18:21:53" itemprop="dateCreated datePublished" datetime="2020-06-29T18:17:31+08:00">2020-06-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">软件工程</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="第一章-微服务"><a href="#第一章-微服务" class="headerlink" title="第一章 微服务"></a>第一章 微服务</h1><h2 id="什么是微服务"><a href="#什么是微服务" class="headerlink" title="什么是微服务"></a>什么是微服务</h2><h3 id="很小，专注于做好一件事"><a href="#很小，专注于做好一件事" class="headerlink" title="很小，专注于做好一件事"></a>很小，专注于做好一件事</h3><p>单一职责原则：把因相同原因而变化的东西聚合到一起，而把因不同原因而变化的东西分离开来。</p>
+<p><strong>怎样确定代码库足够小？</strong></p>
+<ol>
+<li><p>如果你不再感觉你的代码库过大，可能它就足够小了。</p>
+</li>
+<li><p>代码库的大小要与团队的大小相匹配</p>
+</li>
+</ol>
+   <a id="more"></a>
+
+<h3 id="自治性"><a href="#自治性" class="headerlink" title="自治性"></a>自治性</h3><p>一个微服务就是一个独立的实体。它可以独立地部署在PaaS（Platform as a Service，平台即服务）上，也可以作为一个操作系统的进程存在。</p>
+<p><strong>要尽量避免把多个服务部署到同一台机器上。</strong></p>
+<p>特性：</p>
+<ol>
+<li>服务之间均通过网络调用进行通信，从而加强了服务之间的隔离性，避免紧耦合</li>
+<li>服务可以彼此间独立进行修改，并且某一个服务的部署不应该引起该服务消费方的变动</li>
+<li>服务会暴露出API，然后服务之间通过这些API进行通信</li>
+</ol>
+<h2 id="主要好处"><a href="#主要好处" class="headerlink" title="主要好处"></a>主要好处</h2><h3 id="技术异构性"><a href="#技术异构性" class="headerlink" title="技术异构性"></a>技术异构性</h3><p>在一个由多服务构成的系统，可以在不同的服务中使用最合适该服务的技术。</p>
+<h3 id="弹性"><a href="#弹性" class="headerlink" title="弹性"></a>弹性</h3><p>在单块系统中，如果服务不可用，那么所有的功能都会不可用，这可以通过将同样的实例运行在不同的机器上来降低功能完全不可用的概率。<strong>但微服务系统本身就可以解决这个问题。</strong></p>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>单块服务只能作为一个整体进行扩展，而使用微服务，则可以只对需要扩展的服务进行扩展，这样就可以把那些不需要扩展的服务运行在更小的、性能稍差的硬件上。</p>
+<img src="/2020/06/29/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1-%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%AC%94%E8%AE%B0/1.png" class="">
+
+<h3 id="简化部署"><a href="#简化部署" class="headerlink" title="简化部署"></a>简化部署</h3><p>微服务中，可以服务进行独立部署。</p>
+<h3 id="与组织结果相匹配"><a href="#与组织结果相匹配" class="headerlink" title="与组织结果相匹配"></a>与组织结果相匹配</h3><p>不同大小的服务由合适规模的团队负责。</p>
+<h3 id="可组合性"><a href="#可组合性" class="headerlink" title="可组合性"></a>可组合性</h3><p><strong>服务（接口）的重用，而不仅仅是代码的重用！</strong></p>
+<p>比如我在手机上使用微服务开发了一套接口用来定位，那么这套接口也可以用在智能手表上的定位功能。</p>
+<h3 id="对可替代的优化"><a href="#对可替代的优化" class="headerlink" title="对可替代的优化"></a>对可替代的优化</h3><p>使用微服务可以在需要的时候轻易地重写服务，或者删除不再使用的服务。</p>
+<h2 id="面向服务的架构"><a href="#面向服务的架构" class="headerlink" title="面向服务的架构"></a>面向服务的架构</h2><p>SOA（Service-Oriented Architecture，面向服务的架构）是一种设计方法，其中包括多个服务，而服务之间通过配合最终会提供一系列功能。一个服务通常以独立的形式存在于操作系统进程中。服务之间通过网络调用，而非采用进程内调用的方式进行通信。</p>
+<p>实施SOA会遇到一些问题：</p>
+<ul>
+<li>通信协议如何选择</li>
+<li>第三方中间件如何选择</li>
+<li>服务粒度如何确定</li>
+</ul>
+<h2 id="其它分解技术"><a href="#其它分解技术" class="headerlink" title="其它分解技术"></a>其它分解技术</h2><h3 id="共享库"><a href="#共享库" class="headerlink" title="共享库"></a>共享库</h3><p>缺点：</p>
+<ul>
+<li>无法使用异构的技术。一般来讲，这些库只能在同一种语言中，或者至少在同一个平台上使用。</li>
+<li>失去了独立地对系统某一个部分进行扩展的能力。</li>
+<li>除非使用的是动态链接库，否则每当库有更新的时候，都需要重新部署整个进程，以至于无法独立地部署变更。</li>
+<li>可能会成为一个耦合点</li>
+</ul>
+<p>服务之间可以并应该大量使用第三方库来重用公共代码，但有时候效果不太好。</p>
+<h3 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h3><p>OSGI（Open Source Gateway Initiative，开放服务网关协议），一个与具体技术相关地模块分解技术。</p>
+<p>OSGI是什么：</p>
+<p><a href="http://www.osgi.com.cn/article/7289226" target="_blank" rel="noopener">OSGi简介</a></p>
+<p>OSGi技术是指一系列用于定义Java动态化组件系统的标准。这些标准通过为大型分布式系统以及嵌入式系统提供一种模块化架构减少了软件的复杂度。</p>
+<p>作者对OSGI的经验：它带来的复杂度要远远大于它带来的好处，即使对于很优秀的团队来说也是不可避免的。</p>
+<h2 id="没有银弹"><a href="#没有银弹" class="headerlink" title="没有银弹"></a>没有银弹</h2><p>微服务不是一个通用的方法。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/23/Memcached%E4%BB%8B%E7%BB%8D%E4%B8%8E%E4%BD%BF%E7%94%A8/" rel="prev" title="Memcached介绍与使用">
+      <i class="fa fa-chevron-left"></i> Memcached介绍与使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#第一章-微服务"><span class="nav-number">1.</span> <span class="nav-text">第一章 微服务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是微服务"><span class="nav-number">1.1.</span> <span class="nav-text">什么是微服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#很小，专注于做好一件事"><span class="nav-number">1.1.1.</span> <span class="nav-text">很小，专注于做好一件事</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自治性"><span class="nav-number">1.1.2.</span> <span class="nav-text">自治性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主要好处"><span class="nav-number">1.2.</span> <span class="nav-text">主要好处</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#技术异构性"><span class="nav-number">1.2.1.</span> <span class="nav-text">技术异构性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#弹性"><span class="nav-number">1.2.2.</span> <span class="nav-text">弹性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扩展"><span class="nav-number">1.2.3.</span> <span class="nav-text">扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简化部署"><span class="nav-number">1.2.4.</span> <span class="nav-text">简化部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与组织结果相匹配"><span class="nav-number">1.2.5.</span> <span class="nav-text">与组织结果相匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可组合性"><span class="nav-number">1.2.6.</span> <span class="nav-text">可组合性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对可替代的优化"><span class="nav-number">1.2.7.</span> <span class="nav-text">对可替代的优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面向服务的架构"><span class="nav-number">1.3.</span> <span class="nav-text">面向服务的架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它分解技术"><span class="nav-number">1.4.</span> <span class="nav-text">其它分解技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#共享库"><span class="nav-number">1.4.1.</span> <span class="nav-text">共享库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模块"><span class="nav-number">1.4.2.</span> <span class="nav-text">模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#没有银弹"><span class="nav-number">1.5.</span> <span class="nav-text">没有银弹</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">子夕听雨</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">子夕听雨</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
